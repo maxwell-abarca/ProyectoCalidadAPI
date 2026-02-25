@@ -10,6 +10,10 @@ public class EmailInfo {
         setEmailAddress(emailAddress);
     }
 
+    public EmailInfo() {
+
+    }
+
     public String getName() {
         return name;
     }

@@ -84,4 +84,7 @@ public class Notification {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public void setMessage(String mensajePrivado) {
+    }
 }
