@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +14,8 @@ import java.util.Random;
 
 @Service
 public class OtpService {
+    private static final String DEFAULT_EMAIL = "robertaraya382@gmail.com";
+    private static final String OTP_SUBJECT = "Codigo de verificacion";
 
     @Autowired
     private OtpRepository otpRepository;
@@ -22,8 +23,13 @@ public class OtpService {
     private EmailService emailService;
 
     public String generateOtp() {
-        String email = "robertaraya382@gmail.com";
-        String otp = String.valueOf(new Random().nextInt(999999));
+        return generateOtp(DEFAULT_EMAIL);
+    }
+
+    public String generateOtp(String email) {
+        validateEmail(email);
+
+        String otp = String.format("%06d", new Random().nextInt(1_000_000));
         LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(5);
 
         Otp otpEntity = new Otp();
@@ -39,6 +45,9 @@ public class OtpService {
     }
 
     public boolean validateOtp(String email, String otpCode) {
+        validateEmail(email);
+        validateOtpCode(otpCode);
+
         Optional<Otp> otpOptional = otpRepository.findByOtpCodeAndEmail(otpCode, email);
 
         if (otpOptional.isPresent()) {
@@ -48,10 +57,9 @@ public class OtpService {
             if (otp.getExpiryTime().isAfter(now)) {
                 otpRepository.delete(otp);
                 return true;
-            } else {
-                otpRepository.delete(otp);
-                return false;
             }
+            otpRepository.delete(otp);
+            return false;
         }
         return false;
     }
@@ -65,13 +73,12 @@ public class OtpService {
     }
 
     private void sendOtpEmail(String email, String otp) {
-        String subject = "Codigo de verificacion";
         String emailBody = "Tu codigo de verificacion es: " + otp + "\n Este codigo expira en 10 minutos.";
         EmailDetails emailDetails = createEmailDetails(email, emailBody);
         try {
             emailService.sendEmail(emailDetails);
             System.out.println("El correo se envio con exito.");
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Error al enviar el correo electrónico: " + e.getMessage());
         }
     }
@@ -79,8 +86,22 @@ public class OtpService {
     private EmailDetails createEmailDetails(String email, String emailBody) {
         EmailInfo fromAddress = new EmailInfo("JBart", email);
         EmailInfo toAddress = new EmailInfo("User", email);
-        String subject = "Codigo de verificacion";
 
-        return new EmailDetails(fromAddress, toAddress, subject, emailBody);
+        return new EmailDetails(fromAddress, toAddress, OTP_SUBJECT, emailBody);
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email no puede ser nulo o vacio");
+        }
+    }
+
+    private void validateOtpCode(String otpCode) {
+        if (otpCode == null || otpCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("OTP no puede ser nulo o vacio");
+        }
+        if (!otpCode.matches("\\d+")) {
+            throw new IllegalArgumentException("OTP debe contener solo digitos");
+        }
     }
 }
