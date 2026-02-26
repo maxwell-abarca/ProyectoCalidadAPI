@@ -75,4 +75,23 @@ class AuthenticationServiceTest {
         assertThrows(BadCredentialsException.class, () -> authenticationService.authenticate(input));
         verify(userRepository, never()).findByEmail(anyString());
     }
+
+    @Test
+    void authenticate_noModificaInputUser() {
+        User inputUser = new User();
+        inputUser.setEmail("cl@gmail.com");
+        inputUser.setPassword("12345");
+
+        String emailOriginal = inputUser.getEmail();
+        String passwordOriginal = inputUser.getPassword();
+
+        User mockUserDb = new User();
+        mockUserDb.setEmail(emailOriginal);
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(mockUserDb));
+
+        authenticationService.authenticate(inputUser);
+
+        assertEquals(emailOriginal, inputUser.getEmail());
+        assertEquals(passwordOriginal, inputUser.getPassword());
+    }
 }
