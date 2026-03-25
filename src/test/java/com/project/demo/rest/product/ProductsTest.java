@@ -139,4 +139,56 @@ class ProductsTest {
                 .then()
                 .statusCode(400); // Spring Boot falla en la conversión de Long
     }
+
+    @Test
+    void filterByName_nombreExistente() {
+
+        given()
+                .header("Authorization", "Bearer " + buyerToken)
+                .pathParam("name", "Camisa")
+                .when()
+                .get("/products/filterByName/{name}")
+                .then()
+                .statusCode(200)
+                .body("size()", greaterThan(0));
+    }
+
+    @Test
+    void filterByName_coincidenciaParcial() {
+
+        given()
+                .header("Authorization", "Bearer " + buyerToken)
+                .pathParam("name", "Cam")
+                .when()
+                .get("/products/filterByName/{name}")
+                .then()
+                .statusCode(200)
+                .body("size()", greaterThan(0));
+    }
+
+    @Test
+    void filterByName_nombreInexistente() {
+
+        given()
+                .header("Authorization", "Bearer " + buyerToken)
+                .pathParam("name", "productoNoExistente")
+                .when()
+                .get("/products/filterByName/{name}")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(0));
+    }
+
+    @Test
+    void filterByName_tokenInvalido() {
+
+        given()
+                .header("Authorization", "Bearer tokenInvalido")
+                .pathParam("name", "Camisa")
+                .when()
+                .get("/products/filterByName/{name}")
+                .then()
+                .statusCode(403);
+    }
+
 }

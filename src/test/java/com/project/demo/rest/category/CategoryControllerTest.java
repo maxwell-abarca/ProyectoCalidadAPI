@@ -133,4 +133,26 @@ class CategoryControllerTest {
                 .body("status", equalTo(500))
                 .body("description", equalTo("Unknown internal server error."));
     }
+
+    @Test
+    void getCategories_tokenValido() {
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/categories")
+                .then()
+                .statusCode(200)
+                .body("size()", greaterThan(0));
+    }
+
+    @Test
+    void getCategories_sinToken() {
+
+        given()
+                .when()
+                .get("/categories")
+                .then()
+                .statusCode(403);
+    }
 }
