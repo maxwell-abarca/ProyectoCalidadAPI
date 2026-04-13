@@ -1,11 +1,13 @@
 package com.project.demo.logic.entity.auth;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -21,9 +23,10 @@ class JwtServiceTest {
 
     private UserDetails userA;
     private UserDetails userB;
+    private long originalExpiration;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         userA = User.withUsername("userA")
                 .password("password")
                 .authorities("USER")
@@ -33,6 +36,13 @@ class JwtServiceTest {
                 .password("password")
                 .authorities("USER")
                 .build();
+
+        originalExpiration = jwtService.getExpirationTime();
+    }
+
+    @AfterEach
+    void tearDown() {
+        ReflectionTestUtils.setField(jwtService, "jwtExpiration", originalExpiration);
     }
 
     @Test
@@ -60,7 +70,6 @@ class JwtServiceTest {
     void getExpirationTime_retornaValorConfigurado() {
         long expiration = jwtService.getExpirationTime();
 
-        assertNotNull(expiration);
         assertTrue(expiration > 0);
     }
 
@@ -84,10 +93,12 @@ class JwtServiceTest {
 
     @Test
     void isTokenValid_tokenExpirado_false() throws Exception {
+        ReflectionTestUtils.setField(jwtService, "jwtExpiration", 1L);
+
         Map<String, Object> claims = new HashMap<>();
         String token = jwtService.generateToken(claims, userA);
 
-        Thread.sleep(2000);
+        Thread.sleep(10);
 
         boolean isValid = jwtService.isTokenValid(token, userA);
 
