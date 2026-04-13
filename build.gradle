@@ -57,8 +57,8 @@ tasks.named('jacocoTestReport') {
 
 sonarqube {
 	properties {
-		property "sonar.projectKey", "ProyectoCalidadAPI"
-		property "sonar.projectName", "ProyectoCalidadAPI"
+		property "sonar.projectKey", "ProyectoCalidad"
+		property "sonar.projectName", "ProyectoCalidad"
 		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
 	}
 }
