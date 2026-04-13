@@ -6,6 +6,12 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'CasoEstudio3', url: 'https://github.com/maxwell-abarca/ProyectoCalidadAPI.git'
+            }
+        }
+
         stage('Preparar wrapper') {
             steps {
                 sh 'chmod +x gradlew'
@@ -18,7 +24,7 @@ pipeline {
             }
             post {
                 always {
-                    junit testResults: 'build/test-results/test/*.xml', allowEmptyResults: true
+                    junit 'build/test-results/test/*.xml'
                     archiveArtifacts artifacts: 'build/reports/jacoco/test/html/**', allowEmptyArchive: true
                 }
             }
