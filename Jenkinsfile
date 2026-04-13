@@ -20,7 +20,7 @@ pipeline {
 
         stage('Compilar y ejecutar pruebas') {
             steps {
-                sh './gradlew clean test jacocoTestReport'
+                sh './gradlew clean test jacocoTestReport --no-daemon'
             }
             post {
                 always {
@@ -29,10 +29,11 @@ pipeline {
                 }
             }
         }
+
         stage('Analisis SonarQube') {
             steps {
                 withSonarQubeEnv('Local SonarQube') {
-                    sh './gradlew sonarqube'
+                    sh './gradlew sonar --no-daemon'
                 }
             }
         }
