@@ -29,7 +29,6 @@ pipeline {
                 }
             }
         }
-
         stage('Analisis SonarQube') {
             steps {
                 withSonarQubeEnv('Local SonarQube') {
