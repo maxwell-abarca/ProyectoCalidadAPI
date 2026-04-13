@@ -6,12 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'Test', url: 'https://github.com/maxwell-abarca/ProyectoCalidadAPI.git'
-            }
-        }
-
         stage('Preparar wrapper') {
             steps {
                 sh 'chmod +x gradlew'
@@ -24,7 +18,7 @@ pipeline {
             }
             post {
                 always {
-                    junit 'build/test-results/test/*.xml'
+                    junit testResults: 'build/test-results/test/*.xml', allowEmptyResults: true
                     archiveArtifacts artifacts: 'build/reports/jacoco/test/html/**', allowEmptyArchive: true
                 }
             }
