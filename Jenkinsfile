@@ -6,12 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'CasoEstudio3', url: 'https://github.com/maxwell-abarca/ProyectoCalidadAPI.git'
-            }
-        }
-
         stage('Preparar wrapper') {
             steps {
                 sh 'chmod +x gradlew'
