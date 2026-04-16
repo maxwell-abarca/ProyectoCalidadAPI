@@ -29,7 +29,7 @@ class CategoryControllerTest {
                 .body("""
                     {
                       "email": "user.buyer@gmail.com",
-                      "password": "userbuyer123"
+                      "password": "userbuyer124"
                     }
                 """)
                 .when()
